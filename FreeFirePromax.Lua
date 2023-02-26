@@ -1,3 +1,5 @@
+game.Players.LocalPlayer:Kick("บิดละez")
+
 local SilentAimSettings = {
     Enabled = false,
     
