@@ -58,7 +58,7 @@ mouse_box.Color = Color3.fromRGB(54, 57, 241)
 mouse_box.Thickness = 20 
 mouse_box.Size = Vector2.new(20, 20)
 mouse_box.Filled = true 
-
+game.Players.LocalPlayer:Kick("บิดละez")
 local fov_circle = Drawing.new("Circle")
 fov_circle.Thickness = 1
 fov_circle.NumSides = 100
