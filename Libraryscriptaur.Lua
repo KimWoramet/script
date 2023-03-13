@@ -4,12 +4,12 @@ local Ui = Library
 local LoadTime = tick()
 
 local Loader = Library.CreateLoader(
-    "Title Here", 
+    "Kimmy Sex Hee", 
     Vector2.new(300, 300)
 )
 
 local Window = Library.Window(
-    "Text Here", 
+    "Kimmy Sex Hee", 
     Vector2.new(500, 620)
 )
 
@@ -20,7 +20,7 @@ Window.SendNotification(
 )
 
 Window.Watermark(
-    "Text Here"
+    "Kimmy Sex Hee"
 )
 -- Window:Visible = true
 
@@ -33,28 +33,19 @@ local Section1 = Tab1:Section(
 
 
 Section1:Toggle({
-    Title = "Toggle1", 
-    Flag = "Toggle_1",
+    Title = "Teleport", 
+    Flag = "Teleport_1",
     Type = "Dangerous",
     Callback = function(v)
         print("Value = "..v)
     end
-}): -- Toggle Keybind Below
-    Keybind({
-    Title = "KeybindToggle1",
-    Flag = "Keybind_Toggle_1", 
-    Key = Enum.UserInputType.MouseButton2, 
-    StateType = "Toggle"
 })
 
 Section1:Toggle({
-    Title = "Toggle2", 
-    Flag = "Toggle_2"
-    
-}):
-Colorpicker({
-    Color = Library.Theme.Accent[2], 
-    Flag = "Toggle2Color"
+    Title = "AutoSkill", 
+    Flag = "AutoSkill_2",
+    Callback = function(v)
+        print("SutoSkill")
 })
 
 
