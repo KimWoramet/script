@@ -66,7 +66,7 @@ local Library = {
     },
     Input = {
         Caplock = false,
-        LeftShift = false
+        RightControl = true
     },
     Images = {},
     WindowVisible = true,
