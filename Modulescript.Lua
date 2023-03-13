@@ -4251,7 +4251,7 @@ Utility.AddConnection(UserInput.InputBegan, function(Input, Useless)
     if Useless then
         return
     end
-    if Input.KeyCode == Enum.KeyCode.RightShift then
+    if Input.KeyCode == Enum.KeyCode.RightControl then
         Library:ChangeVisible(not Library.WindowVisible)
     end
 end)
