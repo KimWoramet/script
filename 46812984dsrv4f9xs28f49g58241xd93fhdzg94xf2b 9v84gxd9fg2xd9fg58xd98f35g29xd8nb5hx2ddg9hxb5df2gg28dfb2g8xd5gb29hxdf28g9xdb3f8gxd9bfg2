@@ -10,7 +10,7 @@ local main = library:Load{
     SizeY = 650,
     Theme = "KrukoiHubs",
     Extension = "json", -- config file extension
-    Folder = "KrukoiHub" -- config folder name
+    Folder = "KrukoiHub" -- config folder namePlayerSts
 }
 
 -- library.Extension = "txt" (config file extension)
@@ -33,6 +33,12 @@ local sectioninplayer = tabplayers:Section{
     Name = "KillPlayers",
     Side = "Left"
 }
+
+local sectioninplayerRight = tabplayers:Section{
+    Name = "Teleport To Player",
+    Side = "Right"
+}
+
 
 local label = section:Label("Main")
 
@@ -99,26 +105,47 @@ spawn(function()
 end)
 
 
-local playerNameKill = ""
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
-local box = sectioninplayer:Box{
-    Name = "NamePlayer",
-    --Default = "hi",
-    Placeholder = "USERNAMEPLAYER",
-    Flag = "Box 1",
-    Callback = function(input)
-        playerNameKill = input
+local function getPlayerNames()
+    local playerNames = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            table.insert(playerNames, player.Name)
+        end
     end
+    return playerNames
+end
+
+local dropdownkill = sectioninplayer:Dropdown{
+    Name = "SelectnamePlayer",
+    Content = getPlayerNames(),
+    Flag = "SelectnamePlayer",
+    Callback = function(option)
+        selectedPlayerName = option
+    end,
 }
+
+Players.PlayerAdded:Connect(function(player)
+    dropdownkill:Refresh(getPlayerNames())
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    dropdownkill:Refresh(getPlayerNames())
+end)
 
 sectioninplayer:Button{
     Name = "Kill",
     Callback  = function()
         local EventName = "Respawn"
-        local GetNamePlayer = game:GetService("Players")[playerNameKill]
-        game:GetService("ReplicatedStorage").ReviveSystem.Event:FireServer(EventName, GetNamePlayer)
+        local selectedPlayer = Players:FindFirstChild(selectedPlayerName)
+        if selectedPlayer then
+            game:GetService("ReplicatedStorage").ReviveSystem.Event:FireServer(EventName, selectedPlayer)
+        end
     end
 }
+
 
 
 
@@ -133,7 +160,114 @@ sectioninplayer:Button{
     end
 }
 
-local toggleautoRevive = sectioninplayer:Toggle{
+
+
+--box:Set("New box text")
+local playerSpeed = game.Players.LocalPlayer.Character.Humanoid.WalkSpeed
+
+local SpeedSlider = sectionright:Slider{
+    Name = "Speed",
+    Text = "[value]/200",
+    Default = 16,
+    Min = 16,
+    Max = 200,
+    Float = 1,
+    Flag = "Speed",
+    Callback = function(speedValue)
+        playerSpeed = speedValue
+    end
+}
+
+local enableSpeedSet = sectionright:Toggle{
+    Name = "EnableSpeedSet",
+    Flag = "EnableSpeedSet",
+    Callback = function(enable)
+        _G.speedSetEnabled = enable
+    end
+}
+
+spawn(function()
+    while wait() do
+        pcall(function()
+        if _G.speedSetEnabled then
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = playerSpeed
+        else game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+        end
+        end)
+    end
+end)
+
+
+local JumpSlider = sectionright:Slider{
+    Name = "JumpPower",
+    Text = "[value]/200",
+    Default = 50,
+    Min = 50,
+    Max = 200,
+    Float = 1,
+    Flag = "Speed",
+    Callback = function(JumpValue)
+        playerJumppower = JumpValue
+    end
+}
+
+local enableJumpPower = sectionright:Toggle{
+    Name = "EnablePowerJumpSet",
+    Flag = "EnablePowerJumpSet",
+    Callback = function(enable)
+        _G.enableJumpPower = enable
+    end
+}
+
+spawn(function()
+    while wait() do
+        pcall(function()
+        if _G.enableJumpPower then
+            game.Players.LocalPlayer.Character.Humanoid.JumpPower = playerJumppower
+        else game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
+        end
+        end)
+    end
+end)
+
+
+sectionright:Button{
+    Name = "remove clothes",
+    Callback  = function()
+        game:GetService("Players").LocalPlayer.Character.Shirt.ShirtTemplate = ""
+        game:GetService("Players").LocalPlayer.Character.Pants.PantsTemplate = ""
+        game:GetService("Players").LocalPlayer.Character.Head.face.Texture = ""
+        local className = "Accessory"
+        local player = game.Players.LocalPlayer 
+        local function deleteInstances(class, parent)
+            local instances = parent:GetDescendants()
+            for _, instance in ipairs(instances) do
+                if instance:IsA(class) then
+                    instance:Destroy()
+                end
+            end
+        end
+        local character = player.Character
+        if character then
+            deleteInstances(className, character)
+        else
+        end
+    end
+}
+
+sectionright:Button{
+    Name = "ResetCharacter",
+    Callback  = function()
+        game.Players.LocalPlayer.Character.Humanoid.Health = 0
+        wait(2)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1839.18677, 31.7033615, 206.184509)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1839.18677, 31.7033615, 206.184509)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1839.18677, 31.7033615, 206.184509)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1839.18677, 31.7033615, 206.184509)
+    end
+}
+
+local toggleautoRevive = sectionright:Toggle{
     Name = "ReviveAuto",
     Flag = "If LocalPlayer Die System revive",
     Default = true,
@@ -164,38 +298,64 @@ end)
 
 
 
---box:Set("New box text")
-local playerSpeed = game.Players.LocalPlayer.Character.Humanoid.WalkSpeed
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
-local slider = sectionright:Slider{
-    Name = "Speed",
-    Text = "[value]/200",
-    Default = 16,
-    Min = 16,
-    Max = 200,
-    Float = 1,
-    Flag = "Speed",
-    Callback = function(speedValue)
-        playerSpeed = speedValue
+local function getPlayerNames()
+    local playerNames = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            table.insert(playerNames, player.Name)
+        end
     end
+    return playerNames
+end
+
+local dropdowntp = sectioninplayerRight:Dropdown{
+    Name = "SelectNamePlayer",
+    Content = getPlayerNames(),
+    Flag = "SelectNamePlayer",
+    Callback = function(option)
+        PlayerNameTeleport = option
+    end,
 }
 
-local enableSpeedSet = sectionright:Toggle{
-    Name = "EnableSpeedSet",
-    Flag = "EnableSpeedSet",
-    Callback = function(enable)
-        _G.speedSetEnabled = enable
-    end
+Players.PlayerAdded:Connect(function(player)
+    dropdowntp:Refresh(getPlayerNames())
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    dropdowntp:Refresh(getPlayerNames())
+end)
+
+local toggleteleport = sectioninplayerRight:Toggle{
+    Name = "Teleport",
+    Flag = "If enable LocalPlayer To Player is set",
+    Default = false,
+    Callback  = function(TeleportEnable)
+        _G.TeleportToPlayers = TeleportEnable
+    end,
 }
 
 spawn(function()
-    while wait() do
-        if _G.speedSetEnabled then
-            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = playerSpeed
-        else game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
-        end
+    while wait(0.0000000000000001) do
+        pcall(function()
+            if _G.TeleportToPlayers then
+                local player = game:GetService("Players"):FindFirstChild(PlayerNameTeleport)
+                if player then
+                    local character = player.Character
+                    if character then
+                        local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+                        local targetCFrame = humanoidRootPart.CFrame + Vector3.new(0, 5, 0)
+                        game.Players.LocalPlayer.Character:MoveTo(targetCFrame.Position)
+                    end
+                end
+            end
+        end)
     end
 end)
+
+
 
 
 
