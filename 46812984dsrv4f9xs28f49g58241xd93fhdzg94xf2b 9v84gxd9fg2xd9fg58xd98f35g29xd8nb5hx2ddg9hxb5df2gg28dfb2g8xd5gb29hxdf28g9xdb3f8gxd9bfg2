@@ -1,0 +1,439 @@
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/KimWoramet/KrukoiHub2.0/main/srcui.py"))()
+
+local watermark = library:Watermark("KrukoiHub StreamSpoof")
+-- watermark:Set("Watermark Set")
+-- watermark:Hide() -- toggles watermark
+
+local main = library:Load{
+    Name = "SCRATCH SERIES[Official] x KrukoiHub",
+    SizeX = 600,
+    SizeY = 650,
+    Theme = "KrukoiHubs",
+    Extension = "json", -- config file extension
+    Folder = "KrukoiHub" -- config folder name
+}
+
+-- library.Extension = "txt" (config file extension)
+-- library.Folder = "config folder name"
+
+local tab = main:Tab("MainScripts")
+local tabplayers = main:Tab("Player")
+
+local section = tab:Section{
+    Name = "Main",
+    Side = "Left"
+}
+
+local sectionright = tab:Section{
+    Name = "PlayerStats",
+    Side = "Right"
+}
+
+local sectioninplayer = tabplayers:Section{
+    Name = "KillPlayers",
+    Side = "Left"
+}
+
+local label = section:Label("Main")
+
+section:Button{
+    Name = "Discord",
+    Callback  = function()
+        game.Players.LocalPlayer:Kick("ไม่มีหรอกดิสกูอะพวกเอ๋อ.")
+    end
+}
+
+local seperator = section:Separator("OP")
+--separator:Set("Separator Set")
+
+--togglepicker1:Set(Color3.fromRGB(255, 255, 255))
+
+--togglepicker2:Set(Color3.fromRGB(255, 255, 255))
+
+--toggle:Toggle(true)
+local Admin3 = section:Toggle{
+    Name = "ADMIN ADDITEM",
+    Flag = "ADMIN ADDITEM",
+    --Default = true,
+    Callback  = function(adminui)
+        _G.MENUADMIN = adminui
+    end
+}
+
+spawn(function()
+    while wait() do
+        local adminmenu324 = game:GetService("Players").LocalPlayer
+        if _G.MENUADMIN then
+            adminmenu324.PlayerGui["Admin gui"].open.Visible = true
+        else adminmenu324.PlayerGui["Admin gui"].open.Visible = false
+        end
+    end
+end)
+
+local togglesecerity = section:Toggle{
+    Name = "SecerityKick",
+    Flag = "If Player More 1 Player = Kick",
+    --Default = true,
+    Callback  = function(secerity)
+        _G.SecerityKick = secerity
+        
+end,
+}
+
+spawn(function()
+    pcall(function()
+        while true do
+            local playermore = #game.Players:GetPlayers() > 1
+            if _G.SecerityKick then
+                local args = {
+                        [1] = "*"
+                    }
+                    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.MutePlayerRequest:InvokeServer(unpack(args))
+                if playermore then
+                    game.Players.LocalPlayer:Kick("SecurityKick.")
+                end
+            end
+            wait(1)
+        end
+    end)
+end)
+
+
+local playerNameKill = ""
+
+local box = sectioninplayer:Box{
+    Name = "NamePlayer",
+    --Default = "hi",
+    Placeholder = "USERNAMEPLAYER",
+    Flag = "Box 1",
+    Callback = function(input)
+        playerNameKill = input
+    end
+}
+
+sectioninplayer:Button{
+    Name = "Kill",
+    Callback  = function()
+        local EventName = "Respawn"
+        local GetNamePlayer = game:GetService("Players")[playerNameKill]
+        game:GetService("ReplicatedStorage").ReviveSystem.Event:FireServer(EventName, GetNamePlayer)
+    end
+}
+
+
+
+sectioninplayer:Button{
+    Name = "Kill All Players",
+    Callback  = function()
+        local EventNameRes = "Respawn"
+        local KillallGetPlayer = game:GetService("Players"):GetPlayers()
+        for i, player in ipairs(KillallGetPlayer) do
+            game:GetService("ReplicatedStorage").ReviveSystem.Event:FireServer(EventNameRes, player)
+        end
+    end
+}
+
+
+
+--box:Set("New box text")
+local playerSpeed = game.Players.LocalPlayer.Character.Humanoid.WalkSpeed
+
+local slider = sectionright:Slider{
+    Name = "Speed",
+    Text = "[value]/200",
+    Default = 16,
+    Min = 16,
+    Max = 200,
+    Float = 1,
+    Flag = "Speed",
+    Callback = function(speedValue)
+        playerSpeed = speedValue
+    end
+}
+
+local enableSpeedSet = sectionright:Toggle{
+    Name = "EnableSpeedSet",
+    Flag = "EnableSpeedSet",
+    Callback = function(enable)
+        _G.speedSetEnabled = enable
+    end
+}
+
+spawn(function()
+    while wait() do
+        if _G.speedSetEnabled then
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = playerSpeed
+        else game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+        end
+    end
+end)
+
+
+
+--library:SaveConfig("config", true) -- universal config
+--library:SaveConfig("config") -- game specific config
+--library:DeleteConfig("config", true) -- universal config
+--library:DeleteConfig("config") -- game specific config
+--library:GetConfigs(true) -- return universal and game specific configs (table)
+--library:GetConfigs() -- return game specific configs (table)
+--library:LoadConfig("config", true) -- load universal config
+--library:LoadConfig("config") -- load game specific config
+
+local configs = main:Tab("Configuration")
+
+local themes = configs:Section{Name = "Theme", Side = "Left"}
+
+local themepickers = {}
+
+local themelist = themes:Dropdown{
+    Name = "Theme",
+    Default = library.currenttheme,
+    Content = library:GetThemes(),
+    Flag = "Theme Dropdown",
+    Callback = function(option)
+        if option then
+            library:SetTheme(option)
+
+            for option, picker in next, themepickers do
+                picker:Set(library.theme[option])
+            end
+        end
+    end
+}
+
+library:ConfigIgnore("Theme Dropdown")
+
+local namebox = themes:Box{
+    Name = "Custom Theme Name",
+    Placeholder = "Custom Theme",
+    Flag = "Custom Theme"
+}
+
+library:ConfigIgnore("Custom Theme")
+
+themes:Button{
+    Name = "Save Custom Theme",
+    Callback = function()
+        if library:SaveCustomTheme(library.flags["Custom Theme"]) then
+            themelist:Refresh(library:GetThemes())
+            themelist:Set(library.flags["Custom Theme"])
+            namebox:Set("")
+        end
+    end
+}
+
+local customtheme = configs:Section{Name = "Custom Theme", Side = "Right"}
+
+themepickers["Accent"] = customtheme:ColorPicker{
+    Name = "Accent",
+    Default = library.theme["Accent"],
+    Flag = "Accent",
+    Callback = function(color)
+        library:ChangeThemeOption("Accent", color)
+    end
+}
+
+library:ConfigIgnore("Accent")
+
+themepickers["Window Background"] = customtheme:ColorPicker{
+    Name = "Window Background",
+    Default = library.theme["Window Background"],
+    Flag = "Window Background",
+    Callback = function(color)
+        library:ChangeThemeOption("Window Background", color)
+    end
+}
+
+library:ConfigIgnore("Window Background")
+
+themepickers["Window Border"] = customtheme:ColorPicker{
+    Name = "Window Border",
+    Default = library.theme["Window Border"],
+    Flag = "Window Border",
+    Callback = function(color)
+        library:ChangeThemeOption("Window Border", color)
+    end
+}
+
+library:ConfigIgnore("Window Border")
+
+themepickers["Tab Background"] = customtheme:ColorPicker{
+    Name = "Tab Background",
+    Default = library.theme["Tab Background"],
+    Flag = "Tab Background",
+    Callback = function(color)
+        library:ChangeThemeOption("Tab Background", color)
+    end
+}
+
+library:ConfigIgnore("Tab Background")
+
+themepickers["Tab Border"] = customtheme:ColorPicker{
+    Name = "Tab Border",
+    Default = library.theme["Tab Border"],
+    Flag = "Tab Border",
+    Callback = function(color)
+        library:ChangeThemeOption("Tab Border", color)
+    end
+}
+
+library:ConfigIgnore("Tab Border")
+
+themepickers["Tab Toggle Background"] = customtheme:ColorPicker{
+    Name = "Tab Toggle Background",
+    Default = library.theme["Tab Toggle Background"],
+    Flag = "Tab Toggle Background",
+    Callback = function(color)
+        library:ChangeThemeOption("Tab Toggle Background", color)
+    end
+}
+
+library:ConfigIgnore("Tab Toggle Background")
+
+themepickers["Section Background"] = customtheme:ColorPicker{
+    Name = "Section Background",
+    Default = library.theme["Section Background"],
+    Flag = "Section Background",
+    Callback = function(color)
+        library:ChangeThemeOption("Section Background", color)
+    end
+}
+
+library:ConfigIgnore("Section Background")
+
+themepickers["Section Border"] = customtheme:ColorPicker{
+    Name = "Section Border",
+    Default = library.theme["Section Border"],
+    Flag = "Section Border",
+    Callback = function(color)
+        library:ChangeThemeOption("Section Border", color)
+    end
+}
+
+library:ConfigIgnore("Section Border")
+
+themepickers["Text"] = customtheme:ColorPicker{
+    Name = "Text",
+    Default = library.theme["Text"],
+    Flag = "Text",
+    Callback = function(color)
+        library:ChangeThemeOption("Text", color)
+    end
+}
+
+library:ConfigIgnore("Text")
+
+themepickers["Disabled Text"] = customtheme:ColorPicker{
+    Name = "Disabled Text",
+    Default = library.theme["Disabled Text"],
+    Flag = "Disabled Text",
+    Callback = function(color)
+        library:ChangeThemeOption("Disabled Text", color)
+    end
+}
+
+library:ConfigIgnore("Disabled Text")
+
+themepickers["Object Background"] = customtheme:ColorPicker{
+    Name = "Object Background",
+    Default = library.theme["Object Background"],
+    Flag = "Object Background",
+    Callback = function(color)
+        library:ChangeThemeOption("Object Background", color)
+    end
+}
+
+library:ConfigIgnore("Object Background")
+
+themepickers["Object Border"] = customtheme:ColorPicker{
+    Name = "Object Border",
+    Default = library.theme["Object Border"],
+    Flag = "Object Border",
+    Callback = function(color)
+        library:ChangeThemeOption("Object Border", color)
+    end
+}
+
+library:ConfigIgnore("Object Border")
+
+themepickers["Dropdown Option Background"] = customtheme:ColorPicker{
+    Name = "Dropdown Option Background",
+    Default = library.theme["Dropdown Option Background"],
+    Flag = "Dropdown Option Background",
+    Callback = function(color)
+        library:ChangeThemeOption("Dropdown Option Background", color)
+    end
+}
+
+library:ConfigIgnore("Dropdown Option Background")
+
+local configsection = configs:Section{Name = "Configs", Side = "Left"}
+
+local configlist = configsection:Dropdown{
+    Name = "Configs",
+    Content = library:GetConfigs(), -- GetConfigs(true) if you want universal configs
+    Flag = "Config Dropdown"
+}
+
+library:ConfigIgnore("Config Dropdown")
+
+local loadconfig = configsection:Button{
+    Name = "Load Config",
+    Callback = function()
+        library:LoadConfig(library.flags["Config Dropdown"]) -- LoadConfig(library.flags["Config Dropdown"], true)  if you want universal configs
+    end
+}
+
+local delconfig = configsection:Button{
+    Name = "Delete Config",
+    Callback = function()
+        library:DeleteConfig(library.flags["Config Dropdown"]) -- DeleteConfig(library.flags["Config Dropdown"], true)  if you want universal configs
+        configlist:Refresh(library:GetConfigs())
+    end
+}
+
+
+local configbox = configsection:Box{
+    Name = "Config Name",
+    Placeholder = "Config Name",
+    Flag = "Config Name"
+}
+
+library:ConfigIgnore("Config Name")
+
+local save = configsection:Button{
+    Name = "Save Config",
+    Callback = function()
+        library:SaveConfig(library.flags["Config Dropdown"] or library.flags["Config Name"]) -- SaveConfig(library.flags["Config Name"], true) if you want universal configs
+        configlist:Refresh(library:GetConfigs())
+    end
+}
+
+local keybindsection = configs:Section{Name = "UI Toggle Keybind", Side = "Left"}
+
+keybindsection:Keybind{
+    Name = "UI Toggle",
+    Flag = "UI Toggle",
+    Default = Enum.KeyCode.RightControl,
+    Blacklist = {Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2, Enum.UserInputType.MouseButton3},
+    Callback = function(_, fromsetting)
+        if not fromsetting then
+            library:Close()
+        end
+    end
+}
+
+keybindsection:Keybind{
+    Name = "Destroy UI",
+    Flag = "Unload UI",
+    Default = Enum.KeyCode.Delete,
+    Blacklist = {Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2, Enum.UserInputType.MouseButton3},
+    Callback = function(_, fromsetting)
+        if not fromsetting then
+            library:Unload()
+        end
+    end
+}
+
+--library:Close()
+--library:Unload()
