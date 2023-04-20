@@ -133,6 +133,35 @@ sectioninplayer:Button{
     end
 }
 
+local toggleautoRevive = sectioninplayer:Toggle{
+    Name = "ReviveAuto",
+    Flag = "If LocalPlayer Die System revive",
+    Default = true,
+    Callback  = function(ReviveFarm)
+        _G.ReviveAuto = ReviveFarm   
+end,
+}
+
+spawn(function()
+    while true do
+        pcall(function()
+            local AutoReviveSys = "Respawn"
+            local PlayerN = game:GetService("Players").LocalPlayer
+            if _G.ReviveAuto then
+                local character = PlayerN.Character
+                if not character then
+                    return
+                end
+                local humanoid = character:FindFirstChildOfClass("Humanoid")
+                if humanoid.Health == 0 then
+                    game:GetService("ReplicatedStorage").ReviveSystem.Event:FireServer(AutoReviveSys, PlayerN)
+                end
+            end
+        end)
+        wait(1)
+    end
+end)
+
 
 
 --box:Set("New box text")
