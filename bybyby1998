@@ -1,4 +1,4 @@
-print('bypass anticheat success!')
+print('bypassing antispeed hack!')
 while wait() do
 game:GetService("StarterPlayer").StarterCharacterScripts["Anti - fly"]:remove()
 game:GetService("StarterPlayer").StarterCharacterScripts["Anti - speed"]:remove()
