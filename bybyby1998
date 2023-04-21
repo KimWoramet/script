@@ -1,5 +1,15 @@
+scripts = {
+    "Anti - fly",
+    "Anti - speed"
+}
+
+for _, scriptName in ipairs(scripts) do
+    if game:GetService("StarterPlayer").StarterCharacterScripts[scriptName] then
+        game:GetService("StarterPlayer").StarterCharacterScripts[scriptName]:remove()
+    end
+    if game:GetService("Players").LocalPlayer.Character[scriptName] then
+        game:GetService("Players").LocalPlayer.Character[scriptName]:remove()
+    end
+end
+
 print('bypass anticheat success!')
-game:GetService("StarterPlayer").StarterCharacterScripts["Anti - fly"]:remove()
-game:GetService("StarterPlayer").StarterCharacterScripts["Anti - speed"]:remove()
-game:GetService("Players").LocalPlayer.Character["Anti - fly"]:remove()
-game:GetService("Players").LocalPlayer.Character["Anti - speed"]:remove()
