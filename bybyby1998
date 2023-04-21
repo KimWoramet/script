@@ -1,0 +1,5 @@
+print('bypass anticheat success!')
+game:GetService("StarterPlayer").StarterCharacterScripts["Anti - fly"]:remove()
+game:GetService("StarterPlayer").StarterCharacterScripts["Anti - speed"]:remove()
+game:GetService("Players").LocalPlayer.Character["Anti - fly"]:remove()
+game:GetService("Players").LocalPlayer.Character["Anti - speed"]:remove()
