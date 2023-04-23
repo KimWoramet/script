@@ -1,5 +1,4 @@
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/KimWoramet/KrukoiHub2.0/main/srcui.py"))()
-local bypass = loadstring(game:HttpGet("https://raw.githubusercontent.com/KimWoramet/script/main/bybyby1998"))()
 
 local watermark = library:Watermark("KrukoiHub StreamSpoof")
 -- watermark:Set("Watermark Set")
@@ -10,21 +9,9 @@ local main = library:Load{
     SizeX = 600,
     SizeY = 650,
     Theme = "KrukoiHubs",
-    Extension = "json", -- config file extension
-    Folder = "KrukoiHub" -- config folder namePlayerSts
+    Extension = "json", 
+    Folder = "KrukoiHub" 
 }
-
--- library.Extension = "txt" (config file extension)
--- library.Folder = "config folder name"
-
-
---[[
-print('bypass anticheat success!')
-game:GetService("StarterPlayer").StarterCharacterScripts["Anti - fly"]:remove()
-game:GetService("StarterPlayer").StarterCharacterScripts["Anti - speed"]:remove()
-game:GetService("Players").LocalPlayer.Character["Anti - fly"]:remove()
-game:GetService("Players").LocalPlayer.Character["Anti - speed"]:remove() ]]
-
 
 
 local tab = main:Tab("MainScripts")
@@ -49,25 +36,6 @@ local sectioninplayerRight = tabplayers:Section{
     Name = "Teleport To Player",
     Side = "Right"
 }
-
-
-local label = section:Label("Main")
-
-section:Button{
-    Name = "Discord",
-    Callback  = function()
-        game.Players.LocalPlayer:Kick("ไม่มีหรอกดิสกูอะพวกเอ๋อ.")
-    end
-}
-
-local seperator = section:Separator("OP")
---separator:Set("Separator Set")
-
---togglepicker1:Set(Color3.fromRGB(255, 255, 255))
-
---togglepicker2:Set(Color3.fromRGB(255, 255, 255))
-
---toggle:Toggle(true)
 local Admin3 = section:Toggle{
     Name = "ADMIN ADDITEM",
     Flag = "ADMIN ADDITEM",
@@ -79,11 +47,13 @@ local Admin3 = section:Toggle{
 
 spawn(function()
     while wait() do
-        local adminmenu324 = game:GetService("Players").LocalPlayer
-        if _G.MENUADMIN then
-            adminmenu324.PlayerGui["Admin gui"].open.Visible = true
-        else adminmenu324.PlayerGui["Admin gui"].open.Visible = false
-        end
+        pcall(function()
+            local adminmenu324 = game:GetService("Players").LocalPlayer
+            if _G.MENUADMIN then
+                adminmenu324.PlayerGui["Admin gui"].open.Visible = true
+            else adminmenu324.PlayerGui["Admin gui"].open.Visible = false
+            end
+        end)
     end
 end)
 
@@ -101,6 +71,14 @@ spawn(function()
     while wait(0.00000000000000000001) do
         pcall(function()
             if _G.opengacha then
+                game:GetService("ReplicatedStorage").Gacha_Modules.Gacha10.RemoteFunction:InvokeServer()
+                game:GetService("ReplicatedStorage").Gacha_Modules.Gacha10.RemoteFunction:InvokeServer()
+                game:GetService("ReplicatedStorage").Gacha_Modules.Gacha10.RemoteFunction:InvokeServer()
+                game:GetService("ReplicatedStorage").Gacha_Modules.Gacha10.RemoteFunction:InvokeServer()
+                game:GetService("ReplicatedStorage").Gacha_Modules.Gacha10.RemoteFunction:InvokeServer()
+                game:GetService("ReplicatedStorage").Gacha_Modules.Gacha10.RemoteFunction:InvokeServer()
+                game:GetService("ReplicatedStorage").Gacha_Modules.Gacha10.RemoteFunction:InvokeServer()
+                game:GetService("ReplicatedStorage").Gacha_Modules.Gacha10.RemoteFunction:InvokeServer()
                 game:GetService("ReplicatedStorage").Gacha_Modules.Gacha10.RemoteFunction:InvokeServer()
             end
         end)
@@ -214,53 +192,39 @@ local enableSpeedSet = sectionright:Toggle{
     Flag = "EnableSpeedSet",
     Callback = function(enable)
         _G.speedSetEnabled = enable
+        print("bypass anti speedhack success")
     end
 }
+
 
 spawn(function()
     while wait() do
         pcall(function()
+            if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Anti - fly") then
+                game:GetService("Players").LocalPlayer.Character["Anti - fly"]:remove()
+            end
+            if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Anti - speed") then
+                game:GetService("Players").LocalPlayer.Character["Anti - speed"]:remove()
+            end
         if _G.speedSetEnabled then
             game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = playerSpeed
+            if game:GetService("StarterPlayer").StarterCharacterScripts:FindFirstChild("Anti - fly") then
+                game:GetService("StarterPlayer").StarterCharacterScripts["Anti - fly"]:remove()
+            end
+            if game:GetService("StarterPlayer").StarterCharacterScripts:FindFirstChild("Anti - speed") then
+                game:GetService("StarterPlayer").StarterCharacterScripts["Anti - speed"]:remove()
+            end
+            if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Anti - fly") then
+                game:GetService("Players").LocalPlayer.Character["Anti - fly"]:remove()
+            end
+            if game:GetService("Players").LocalPlayer.Character:FindFirstChild("Anti - speed") then
+                game:GetService("Players").LocalPlayer.Character["Anti - speed"]:remove()
+            end
         else game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
         end
         end)
     end
 end)
-
-
-local JumpSlider = sectionright:Slider{
-    Name = "JumpPower",
-    Text = "[value]/2000",
-    Default = 50,
-    Min = 50,
-    Max = 2000,
-    Float = 1,
-    Flag = "Speed",
-    Callback = function(JumpValue)
-        playerJumppower = JumpValue
-    end
-}
-
-local enableJumpPower = sectionright:Toggle{
-    Name = "EnablePowerJumpSet",
-    Flag = "EnablePowerJumpSet",
-    Callback = function(enable)
-        _G.enableJumpPower = enable
-    end
-}
-
-spawn(function()
-    while wait() do
-        pcall(function()
-        if _G.enableJumpPower then
-            game.Players.LocalPlayer.Character.Humanoid.JumpPower = playerJumppower
-        else game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
-        end
-        end)
-    end
-end)
-
 
 sectionright:Button{
     Name = "remove clothes",
@@ -654,6 +618,5 @@ keybindsection:Keybind{
         end
     end
 }
-bypass()
 --library:Close()
 --library:Unload()
