@@ -1,0 +1,653 @@
+local GUI = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+local HttpService = game:GetService("HttpService")
+local SETTINGS_PATH = "Krukoi/KrukoiHub_AnimeRangerX_settings.json"
+
+game:GetService("Players").LocalPlayer.PlayerGui.Notification.Enabled = false
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Window = GUI:CreateWindow({
+    Title = "KrukoiHub AnimeRangerX" .. GUI.Version,
+    SubTitle = "by KimmyBabyBoy",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = false,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.RightControl
+})
+
+
+
+local Tabs = {
+    Main = Window:AddTab({ Title = "Join Game", Icon = "" }),
+    Gameplay = Window:AddTab({ Title = "Gameplay", Icon = "" }),
+    FullyAuto = Window:AddTab({ Title = "AutoJoinGame(Fully Find Unit)", Icon = "" }),
+    Upgrade = Window:AddTab({ Title = "Upgrade(Lobby)", Icon = "" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+
+
+
+--########################## AUTOJOIN ##########################
+
+local WorldStorySelection = Tabs.Main:AddSection("StoryMode")
+
+
+local SelectWorld = WorldStorySelection:AddDropdown("SelectWorld", {
+Title = "SelectWorld",
+Values = {"OnePiece", "Namek", "DemonSlayer", "Naruto", "OPM"},
+Multi = false,
+Default = 1,
+})
+
+local selectedWorld = "OnePiece"
+SelectWorld:OnChanged(function(WorldSelect)
+selectedWorld = WorldSelect
+end)
+
+
+local SelectStageStory = WorldStorySelection:AddDropdown("SelectStageStory", {
+    Title = "SelectStageStory",
+    Values = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+    Multi = false,
+    Default = 1,
+})
+
+local selectedStage = "1"
+SelectStageStory:OnChanged(function(StageSelect)
+    selectedStage = StageSelect
+end)
+
+
+local function firePlayRoom(args)
+    game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(args))
+end
+
+local Difficulty = WorldStorySelection:AddDropdown("DifficultyST", {
+    Title = "DifficultyStage",
+    Values = {"Normal", "Hard", "Nightmare"},
+    Multi = false,
+    Default = 1,
+})
+
+local selectedDifficulty = "Normal"
+Difficulty:OnChanged(function(DifficultySelect)
+    selectedDifficulty = DifficultySelect
+end)
+
+
+local StartStory = WorldStorySelection:AddToggle("TGStartStory", {
+    Title = "AutoJoinStory",
+    Default = false
+})
+local WkStartStory = {
+    [1] = "Start"
+}
+
+
+StartStory:OnChanged(function(ValueAutoStory)
+    if ValueAutoStory then
+        if not (game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value == "Story") then
+            local createArgs = {
+                [1] = "Create",
+                [2] = {
+                    ["World"] = selectedWorld,
+                    ["Chapter"] = tonumber(selectedStage)
+                }
+            }
+            game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(createArgs))
+            local changeWorld = {
+                [1] = "Change-World",
+                [2] = {
+                    ["World"] = selectedWorld
+                }
+            }
+            
+            game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeWorld))
+            task.wait(0.5)
+            local chapterName = selectedWorld .. "_Chapter" .. selectedStage
+            local changeStage = {
+                [1] = "Change-Chapter",
+                [2] = {
+                    ["Chapter"] = selectedWorld .. "_Chapter" .. selectedStage
+                }
+            }
+            game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeStage))
+                task.wait(0.5)
+                local ChangeDifficulty = {
+                    [1] = "Change-Difficulty",
+                    [2] = {
+                        ["Difficulty"] = selectedDifficulty
+                    }
+                }
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(ChangeDifficulty))
+                task.wait(0.5)
+            local SubmitCreateStory = {
+                [1] = "Submit"
+            }
+            game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SubmitCreateStory))
+
+            local WkStartStory = {
+                [1] = "Start"
+            }
+            game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(WkStartStory))
+        end
+    end
+end)
+
+
+
+local ChallengeSection = Tabs.Main:AddSection("Challenge")
+
+
+    local CreateChallengeRoom = {
+        [1] = "Create",
+        [2] = {
+            ["CreateChallengeRoom"] = true
+        }
+    }
+
+    local SubmitCreate = {
+        [1] = "Submit"
+    }
+
+    local StartChallenge = {
+        [1] = "Start"
+    }
+    
+    local AutoChallenge = ChallengeSection:AddToggle("TGChallenge", {Title = "AutoJoinChallenge", Default = false })
+
+    AutoChallenge:OnChanged(function(ValueAutoChallenge)
+        task.spawn(function()
+            while AutoChallenge.Value do
+                if game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value ~= "Challenge" then
+                    if game:GetService("ReplicatedStorage").Values.Game.Level.Value == "" then
+                        if game:GetService("ReplicatedStorage"):WaitForChild("Values"):WaitForChild("Game"):WaitForChild("GameRunning").Value == false then
+                            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(CreateChallengeRoom))
+                            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(SubmitCreate))
+                            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(StartChallenge))        
+                        end
+                    end
+                end
+                task.wait(2)
+            end
+        end)
+    end)
+
+
+--################################# This is a AutoReady and Start Game
+
+
+
+local MiscellaneousSection = Tabs.Gameplay:AddSection("Miscellaneous")
+
+local AutoReadyToggle = MiscellaneousSection:AddToggle("TGReady", {Title = "AutoReady/AutoStartGame", Default = false })
+    
+    AutoReadyToggle:OnChanged(function(enabled)
+        task.spawn(function()
+            while AutoReadyToggle.Value do
+                if  game:GetService("ReplicatedStorage"):WaitForChild("Values"):WaitForChild("Game"):WaitForChild("GameRunning").Value == false then
+                    if (game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value == "Ranger Stage") then
+                        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteNext"):FireServer()
+                        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VotePlaying"):FireServer()
+                    else
+                        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteRetry"):FireServer()
+                        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VotePlaying"):FireServer() 
+                    end
+                end
+                if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("RewardsUI") and game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled == true then
+                game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled = false
+                end
+                task.wait(2)
+            end
+        end)
+    end)
+
+
+
+
+
+--############################## RANGER STAGE ##############################--
+
+
+local RangerStageSection = Tabs.Main:AddSection("RangerStage")
+
+    local SelectWorldRangerStage = RangerStageSection:AddDropdown("SelectWorldRangerStage", {
+        Title = "SelectWorldRangerStage",
+        Values = {"OnePiece", "Namek", "DemonSlayer", "Naruto", "OPM"},
+        Multi = false,
+        Default = 1,
+    })
+
+    local selectedWorldRangerStage = "OnePiece"
+    SelectWorldRangerStage:OnChanged(function(WorldSelect)
+        selectedWorldRangerStage = WorldSelect
+    end)
+        
+        
+        local SelectRangerStage = RangerStageSection:AddDropdown("SelectRangerStage", {
+            Title = "SelectRangerStage",
+            Values = {"1", "2", "3"},
+            Multi = false,
+            Default = 1,
+        })
+        
+        local selectedRangerStage = "1"
+        SelectRangerStage:OnChanged(function(RangerStageSelect)
+            selectedRangerStage = RangerStageSelect
+        end)
+
+        
+        local function firePlayRoom(args)
+            game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(args))
+        end
+
+        
+        local StartRangerStage = Tabs.Main:AddToggle("TGStartRangerStart", {
+            Title = "AutoJoinRangerStage",
+            Default = false
+        })
+        
+        StartRangerStage:OnChanged(function(ValueAutoRangerStage)
+            if ValueAutoRangerStage then
+                if not (game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value == "RangerStage") then
+                    local createArgs = {
+                        [1] = "Create",
+                        [2] = {
+                            ["World"] = selectedWorldRangerStage,
+                            ["Chapter"] = tonumber(selectedStage)
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(createArgs))
+                    task.wait(0.5)
+                    local changeMode = {
+                        [1] = "Change-Mode",
+                        [2] = {
+                            ["Mode"] = "Ranger Stage"
+                        }
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeMode))
+                    task.wait(0.5)
+                    local changeWorld = {
+                        [1] = "Change-World",
+                        [2] = {
+                            ["World"] = selectedWorldRangerStage
+                        }
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeWorld))
+                    task.wait(0.5)
+                    local chapterName = selectedWorldRangerStage .. "_RangerStage" .. selectedRangerStage
+                    local changeStage = {
+                        [1] = "Change-RangerStage",
+                        [2] = {
+                            ["Chapter"] = selectedWorldRangerStage .. "_RangerStage" .. selectedRangerStage
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeStage))
+                        task.wait(0.5)
+                    local SubmitCreateStory = {
+                        [1] = "Submit"
+                    }
+                    game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SubmitCreateStory))
+        
+                    local WkStartRangerStage = {
+                        [1] = "Start"
+                    }
+                    game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(WkStartRangerStage))
+                end
+            end
+        end)
+
+        local ChangeRangerStageChapter = Tabs.Main:AddToggle("TGChangeRangerStageChapter", {
+            Title = "ChangeChapterRangerStage",
+            Default = false
+        })
+        
+        ChangeRangerStageChapter:OnChanged(function(ValueChangeRangerStageChapter)
+            if ValueChangeRangerStageChapter then
+                
+                    local createArgs = {
+                        [1] = "Create",
+                        [2] = {
+                            ["World"] = selectedWorldRangerStage,
+                            ["Chapter"] = tonumber(selectedStage)
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(createArgs))
+                    task.wait(0.5)
+                    local changeModeToRangerStage = {
+                        [1] = "Change-Mode",
+                        [2] = {
+                            ["Mode"] = "Ranger Stage"
+                        }
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeModeToRangerStage))
+                    task.wait(0.5)
+                    local changeWorldRangerStage = {
+                        [1] = "Change-World",
+                        [2] = {
+                            ["World"] = selectedWorldRangerStage
+                        }
+                    }
+                    
+                    game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeWorldRangerStage))
+                    task.wait(0.5)
+                    local chapterName = selectedWorldRangerStage .. "_RangerStage" .. selectedRangerStage
+                    local changeStageRanger = {
+                        [1] = "Change-RangerStage",
+                        [2] = {
+                            ["Chapter"] = selectedWorldRangerStage .. "_RangerStage" .. selectedRangerStage
+                        }
+                    }
+                    game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeStageRanger))
+                        task.wait(0.5)
+                    local SubmitChangeChapterRangerStage = {
+                        [1] = "Submit"
+                    }
+                    game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SubmitChangeChapterRangerStage))
+        
+                    local WkChangeRangerStageChapter = {
+                        [1] = "Start"
+                    }
+                    game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(WkChangeRangerStageChapter))
+            end
+        end)
+
+
+--########################## GAMEPLAY ##########################
+
+    local AntiAfkToggle = MiscellaneousSection:AddToggle("TGAntiAfk", {Title = "AntiAFK", Default = false})
+    local vim = game:GetService("VirtualInputManager")
+    local antiAfkRunning = false
+
+AntiAfkToggle:OnChanged(function(AntiAfk) ---------################# AntiAFK
+    antiAfkRunning = AntiAfk
+        task.spawn(function()
+            while antiAfkRunning do
+                game:GetService("Players").LocalPlayer.PlayerGui.Notification.Enabled = false
+                vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+        task.wait(0.5)
+            end
+        end)
+end)
+
+
+
+local GetUpGradeMaxYeld = game:GetService("ReplicatedStorage").Remote.Server.Gameplay.StatsManager
+
+local argsMaxyeld = {
+[1] = "MaximumYen"
+}
+
+
+UpgradeYen= false
+local AutoUpgradeStatsYeld = MiscellaneousSection:AddToggle("AutoUpgradeYen", {Title = "UpgradeYen", Default = false})
+AutoUpgradeStatsYeld:OnChanged(function(UpgradeYeld)
+    UpgradeYen = UpgradeYeld
+        task.spawn(function()
+        while UpgradeYen do
+            GetUpGradeMaxYeld:FireServer(unpack(argsMaxyeld))  
+        task.wait(0.5)
+    end
+end)
+end)
+
+
+local UpgradeSection = Tabs.Gameplay:AddSection("UpgradeUnit")
+
+local GetUnitUpgrade = game:GetService("ReplicatedStorage").Remote.Server.Units.Upgrade
+local LCPLAYER = game:GetService("Players").LocalPlayer
+
+local function WaitForChildTimeout(parent, childName, timeout)
+	local timer = 0
+	while not parent:FindFirstChild(childName) and timer < timeout do
+		task.wait(0.1)
+		timer += 0.1
+	end
+	return parent:FindFirstChild(childName)
+end
+
+local unitFolder = WaitForChildTimeout(LCPLAYER, "UnitsFolder", 5)
+local UnitNames = {}
+
+if unitFolder then
+	for _, unit in ipairs(unitFolder:GetChildren()) do
+		table.insert(UnitNames, unit.Name)
+	end
+end
+
+
+local SelectAutoUpgradeUnit = UpgradeSection:AddDropdown("SelectAutoUpgradeUnit", {
+    Title = "Select Units to Upgrade",
+    Description = "",
+    Values = UnitNames,
+    Multi = true,
+    Default = {}
+})
+
+local SelectedUnits = {}
+
+SelectAutoUpgradeUnit:OnChanged(function(Value)
+    SelectedUnits = {}
+    for UnitName, isSelected in pairs(Value) do
+        if isSelected then
+            table.insert(SelectedUnits, UnitName)
+        end
+    end
+end)
+
+UpgradeUnitSelect = false
+local UpgradeUnitSelect = false
+local AutoUpgradeToggle = UpgradeSection:AddToggle("AutoUpgradeUnitSelect", {
+    Title = "Auto Upgrade Selected Units",
+    Default = false
+})
+
+AutoUpgradeToggle:OnChanged(function(Value)
+    UpgradeUnitSelect = Value
+    task.spawn(function()
+        while UpgradeUnitSelect do
+            if unitFolder then
+                for _, unit in ipairs(unitFolder:GetChildren()) do
+                    if table.find(SelectedUnits, unit.Name) then
+                        GetUnitUpgrade:FireServer(unit)
+                        task.wait(0.2)
+                    end
+                end
+            end
+            task.wait(5)
+        end
+    end)
+end)
+
+
+
+
+UpgradeUnit = false
+
+local AutoUpgradeUnitAll = UpgradeSection:AddToggle("AutoUpgradeUnit", {Title = "AutoUpgradeAllUnit", Default = false})
+
+AutoUpgradeUnitAll:OnChanged(function(UpgradeUnits)
+        UpgradeUnit = UpgradeUnits
+            task.spawn(function()
+                while AutoUpgradeUnitAll.Value do
+                    for _, unit in ipairs(unitFolder:GetChildren()) do
+                        GetUnitUpgrade:FireServer(unit)
+                        task.wait(0.2)
+                    end
+                 task.wait(5)
+                end
+            end)
+        end)
+
+
+
+--####################################### Fully ##################################
+local AutoGetsUnitSecret = Tabs.FullyAuto:AddSection("AutoGetsUnit")
+
+
+local SelectChapter = {
+	[1] = "Create",
+	[2] = {["Chapter"] = "Namek_Chapter2"}}
+local changeModeToRangerStage = {
+                        [1] = "Change-Mode",
+                        [2] = {["Mode"] = "Ranger Stage"}}
+local ChangeWorldToAutoMadara = {
+	[1] = "Change-World",
+	[2] = {["World"] = "Naruto"}}
+local changeStageRangerForGetsMadara1 = {
+                        [1] = "Change-RangerStage",
+                        [2] = {["Chapter"] = "Naruto_RangerStage1"}}
+
+local changeStageRangerForGetsMadara2 = {
+                        [1] = "Change-RangerStage",
+                        [2] = {["Chapter"] = "Naruto_RangerStage2"}}
+
+local changeStageRangerForGetsMadara3 = {
+                        [1] = "Change-RangerStage",
+                        [2] = {["Chapter"] = "Naruto_RangerStage3"}}
+
+local SubmitCreateAutomadara = {[1] = "Submit"}
+local WkAutoStartFarmMadara = {[1] = "Start"}
+
+local GetGameMode = game:GetService("ReplicatedStorage"):WaitForChild("Values"):WaitForChild("Game")
+
+local AutoGetMadara = AutoGetsUnitSecret:AddToggle("TGAutoMadara", {Title = "AutoFindMadara", Default = false })
+
+ValueAutoGetsMadara = false
+AutoGetMadara:OnChanged(function(ValueAutoGetsMadara1)
+    ValueAutoGetsMadara = ValueAutoGetsMadara1
+    task.spawn(function()
+        while AutoGetMadara.Value do 
+            if GetGameMode.Gamemode.Value ~= "Ranger Stage" then
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SelectChapter))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeModeToRangerStage))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(ChangeWorldToAutoMadara))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeStageRangerForGetsMadara1))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SubmitCreateAutomadara))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeStageRangerForGetsMadara2))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SubmitCreateAutomadara))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeStageRangerForGetsMadara3))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SubmitCreateAutomadara))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(WkAutoStartFarmMadara))
+            end
+            task.wait(5)
+        end
+    end)
+end)
+
+
+
+
+
+
+
+
+
+
+
+SaveManager:SetLibrary(GUI)
+InterfaceManager:SetLibrary(GUI)
+
+SaveManager:SetIgnoreIndexes({})
+
+
+InterfaceManager:SetFolder("Krukoi")
+SaveManager:SetFolder("Krukoi")
+
+
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+Window:SelectTab(1)
+
+local function gatherSettings()
+    return {
+        -- MAIN
+        --[[SelectWorld = SelectWorld.Value,
+        SelectStageStory = SelectStageStory.Value,
+        DifficultyST = Difficulty.Value,
+        TGStartStory = StartStory.Value,
+        SelectWorldRangerStage = SelectWorldRangerStage.Value,
+        SelectRangerStage = SelectRangerStage.Value,
+        TGStartRangerStart = StartRangerStage.Value,]]
+        TGChallenge = AutoChallenge.Value,
+
+
+        -- GAMEPLAY
+        TGReady = AutoReadyToggle.Value,
+        TGAntiAfk = AntiAfkToggle.Value,
+        AutoUpgradeYen = AutoUpgradeStatsYeld.Value,
+        AutoUpgradeUnit = AutoUpgradeUnitAll.Value,
+
+        --FullyAutoGetsUnit
+        TGAutoMadara = AutoGetMadara.Value,
+
+
+    }
+end
+
+--// ฟังก์ชัน Save Settings
+local function saveSettings()
+    local settings = gatherSettings()
+    writefile(SETTINGS_PATH, HttpService:JSONEncode(settings))
+end
+
+--// ฟังก์ชัน Load Settings
+local function loadSettings()
+    if not isfile(SETTINGS_PATH) then return end
+
+    local success, data = pcall(function()
+        return HttpService:JSONDecode(readfile(SETTINGS_PATH))
+    end)
+    if success and data then
+        -- MAIN
+        if data.TGChallenge ~= nil then AutoChallenge:SetValue(data.TGChallenge) end
+
+
+
+
+        -- GAMEPLAY
+        if data.TGReady ~= nil then AutoReadyToggle:SetValue(data.TGReady) end
+        if data.TGAntiAfk ~= nil then AntiAfkToggle:SetValue(data.TGAntiAfk) end
+        if data.AutoUpgradeYen ~= nil then AutoUpgradeStatsYeld:SetValue(data.AutoUpgradeYen) end
+        if data.AutoUpgradeUnit ~= nil then AutoUpgradeUnitAll:SetValue(data.AutoUpgradeUnit) end
+        if data.TGAutoMadara ~= nil then AutoGetMadara:SetValue(data.TGAutoMadara) end
+
+        GUI:Notify({
+            Title = "Settings",
+            Content = "Settings Loaded Successfully!",
+            Duration = 5
+        })
+    end
+end
+local SaveSetiings = Tabs.Settings:AddToggle("SaveSetiings", {
+    Title = "Auto Save Settings",
+    Default = false
+})
+
+SaveSetiings:OnChanged(function(enabled)
+    task.spawn(function()
+        while enabled and SaveSetiings.Value do
+            saveSettings()
+            task.wait(5)
+        end
+    end)
+end)
+Tabs.Settings:AddButton({
+    Title = "Load Settings",
+    Description = "Load your saved settings from file.",
+    Callback = function()
+        loadSettings()
+    end
+})
+
+
+loadSettings()
+SaveManager:LoadAutoloadConfig()
