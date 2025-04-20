@@ -1,3 +1,4 @@
+wait(10)
 local GUI = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
@@ -453,7 +454,7 @@ local AutoUpgradeToggle = UpgradeSection:AddToggle("AutoUpgradeUnitSelect", {
 AutoUpgradeToggle:OnChanged(function(Value)
     UpgradeUnitSelect = Value
     task.spawn(function()
-        while UpgradeUnitSelect do
+        while UpgradeUnitSelect.Value do
             if unitFolder then
                 for _, unit in ipairs(unitFolder:GetChildren()) do
                     if table.find(SelectedUnits, unit.Name) then
@@ -567,6 +568,28 @@ InterfaceManager:BuildInterfaceSection(Tabs.Settings)
 SaveManager:BuildConfigSection(Tabs.Settings)
 Window:SelectTab(1)
 
+
+local SaveSetiing = Tabs.Settings:AddToggle("SaveSetiings", {
+    Title = "Auto Save Settings",
+    Default = false
+})
+
+SaveSetiing:OnChanged(function(enabled)
+    task.spawn(function()
+        while enabled and SaveSetiing.Value do
+            saveSettings()
+            task.wait(5)
+        end
+    end)
+end)
+Tabs.Settings:AddButton({
+    Title = "Load Settings",
+    Description = "Load your saved settings from file.",
+    Callback = function()
+        loadSettings()
+    end
+})
+
 local function gatherSettings()
     return {
         -- MAIN
@@ -588,6 +611,7 @@ local function gatherSettings()
 
         --FullyAutoGetsUnit
         TGAutoMadara = AutoGetMadara.Value,
+        SaveSetiings = SaveSetiing.Value,
 
 
     }
@@ -619,6 +643,7 @@ local function loadSettings()
         if data.AutoUpgradeYen ~= nil then AutoUpgradeStatsYeld:SetValue(data.AutoUpgradeYen) end
         if data.AutoUpgradeUnit ~= nil then AutoUpgradeUnitAll:SetValue(data.AutoUpgradeUnit) end
         if data.TGAutoMadara ~= nil then AutoGetMadara:SetValue(data.TGAutoMadara) end
+        if data.SaveSetiings ~= nil then SaveSetiing:SetValue(data.SaveSetiings) end
 
         GUI:Notify({
             Title = "Settings",
@@ -627,26 +652,6 @@ local function loadSettings()
         })
     end
 end
-local SaveSetiings = Tabs.Settings:AddToggle("SaveSetiings", {
-    Title = "Auto Save Settings",
-    Default = false
-})
-
-SaveSetiings:OnChanged(function(enabled)
-    task.spawn(function()
-        while enabled and SaveSetiings.Value do
-            saveSettings()
-            task.wait(5)
-        end
-    end)
-end)
-Tabs.Settings:AddButton({
-    Title = "Load Settings",
-    Description = "Load your saved settings from file.",
-    Callback = function()
-        loadSettings()
-    end
-})
 
 
 loadSettings()
