@@ -631,6 +631,8 @@ local function loadSettings()
     end
 end
 
+loadSettings()
+
 local SaveSetiing = Tabs.Settings:AddToggle("SaveSetiings", {
     Title = "Auto Save Settings",
     Default = true
@@ -655,5 +657,4 @@ Tabs.Settings:AddButton({
 
 
 
-loadSettings()
 SaveManager:LoadAutoloadConfig()
