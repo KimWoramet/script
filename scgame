@@ -140,6 +140,38 @@ StartStory:OnChanged(function(ValueAutoStory)
 end)
 
 
+local Event = Tabs.Main:AddSection("Event")
+
+
+local EasterEventJoin = {
+    [1] = "Easter-Event"
+}
+
+local StartEvent = {
+    [1] = "Start"
+}
+
+local AutoJoinEasterEvent = Event:AddToggle("TGEaster", {Title = "AutoEasterEvent", Default = false })
+
+AutoJoinEasterEvent:OnChanged(function(AutoJoinEasterEventValue)
+    task.spawn(function()
+        while AutoJoinEasterEvent.Value do
+            if game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value ~= "Event" then
+                if game:GetService("ReplicatedStorage").Values.Game.Level.Value == "" then
+                    if game:GetService("ReplicatedStorage"):WaitForChild("Values"):WaitForChild("Game"):WaitForChild("GameRunning").Value == false then
+                        game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(EasterEventJoin))
+                        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(StartEvent))        
+                    end
+                end
+            end
+            task.wait(2)
+        end
+    end)
+end)
+
+
+
+
 
 local ChallengeSection = Tabs.Main:AddSection("Challenge")
 
@@ -200,7 +232,8 @@ local AutoReadyToggle = MiscellaneousSection:AddToggle("TGReady", {Title = "Auto
                     end
                 end
                 if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("RewardsUI") and game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled == true then
-                game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled = false
+                wait(10)
+                    game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled = false
                 end
                 task.wait(2)
             end
@@ -372,8 +405,10 @@ AntiAfkToggle:OnChanged(function(AntiAfk) ---------################# AntiAFK
         task.spawn(function()
             while antiAfkRunning do
                 game:GetService("Players").LocalPlayer.PlayerGui.Notification.Enabled = false
+                if game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled = true then 
                 vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
                 vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                end
         task.wait(0.5)
             end
         end)
@@ -551,9 +586,6 @@ end)
 
 
 
-
-
-
 SaveManager:SetLibrary(GUI)
 InterfaceManager:SetLibrary(GUI)
 
@@ -581,6 +613,7 @@ local function gatherSettings()
         SelectRangerStage = SelectRangerStage.Value,
         TGStartRangerStart = StartRangerStage.Value,]]
         TGChallenge = AutoChallenge.Value,
+        TGEaster = AutoJoinEasterEvent.Value,
 
 
         -- GAMEPLAY
@@ -612,6 +645,7 @@ local function loadSettings()
     if success and data then
         -- MAIN
         if data.TGChallenge ~= nil then AutoChallenge:SetValue(data.TGChallenge) end
+        if data.TGEaster ~= nil then AutoJoinEasterEvent:SetValue(data.TGEaster) end
 
 
 
