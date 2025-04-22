@@ -1,4 +1,4 @@
-wait(2)
+wait(10)
 local GUI = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
@@ -400,19 +400,32 @@ local RangerStageSection = Tabs.Main:AddSection("RangerStage")
     local vim = game:GetService("VirtualInputManager")
     local antiAfkRunning = false
 
-AntiAfkToggle:OnChanged(function(AntiAfk) ---------################# AntiAFK
-    antiAfkRunning = AntiAfk
+    AntiAfkToggle:OnChanged(function(AntiAfk) ---------################# AntiAFK
+        antiAfkRunning = AntiAfk
         task.spawn(function()
             while antiAfkRunning do
-                game:GetService("Players").LocalPlayer.PlayerGui.Notification.Enabled = false
-                if game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled = true then 
-                vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
-                vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                local GetPlayerLocalLL = game:GetService("Players").LocalPlayer
+                local PlayerGuiLL = GetPlayerLocalLL:FindFirstChild("PlayerGui")
+    
+                if gui then
+                    local notifCh = PlayerGuiLL:FindFirstChild("Notification")
+                    local RewardGameCheck = PlayerGuiLL:FindFirstChild("RewardsUI")
+    
+                    -- ปิด Notification
+                    if notifCh then
+                        notifCh.Enabled = false
+                    end
+    
+                    if RewardGameCheck and RewardGameCheck.Enabled then
+                        vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                        vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                    end
                 end
-        task.wait(0.5)
+    
+                task.wait(5)
             end
         end)
-end)
+    end)
 
 
 
