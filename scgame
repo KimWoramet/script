@@ -156,7 +156,6 @@ local AutoJoinEasterEvent = Event:AddToggle("TGEaster", {Title = "AutoEasterEven
 AutoJoinEasterEvent:OnChanged(function(AutoJoinEasterEventValue)
     task.spawn(function()
         while AutoJoinEasterEvent.Value do
-	wait(20)
             if game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value ~= "Event" then
                 if game:GetService("ReplicatedStorage").Values.Game.Level.Value == "" then
                     if game:GetService("ReplicatedStorage"):WaitForChild("Values"):WaitForChild("Game"):WaitForChild("GameRunning").Value == false then
@@ -218,7 +217,7 @@ local ChallengeSection = Tabs.Main:AddSection("Challenge")
 
 local MiscellaneousSection = Tabs.Gameplay:AddSection("Miscellaneous")
 
-local AutoReadyToggle = MiscellaneousSection:AddToggle("TGReady", {Title = "AutoReady/AutoStartGame", Default = false })
+local AutoReadyToggle = MiscellaneousSection:AddToggle("TGReady", {Title = "AutoReady / Reaplay /AutoStartGame", Default = false })
     
     AutoReadyToggle:OnChanged(function(enabled)
         task.spawn(function()
@@ -233,7 +232,6 @@ local AutoReadyToggle = MiscellaneousSection:AddToggle("TGReady", {Title = "Auto
                     end
                 end
                 if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("RewardsUI") and game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled == true then
-                wait(10)
                     game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled = false
                 end
                 task.wait(2)
@@ -241,6 +239,26 @@ local AutoReadyToggle = MiscellaneousSection:AddToggle("TGReady", {Title = "Auto
         end)
     end)
 
+
+
+    local AutoNextToggle = MiscellaneousSection:AddToggle("TGAutoNext", {Title = "AutoNext(Story) / Ready / StartGame", Default = false })
+    
+    AutoNextToggle:OnChanged(function(enabled)
+        task.spawn(function()
+            while AutoNextToggle.Value do
+                if  game:GetService("ReplicatedStorage"):WaitForChild("Values"):WaitForChild("Game"):WaitForChild("GameRunning").Value == false then
+                    if (game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value == "Story") then
+                        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteNext"):FireServer()
+                        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VotePlaying"):FireServer()
+                    end
+                end
+                if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("RewardsUI") and game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled == true then
+                    game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled = false
+                end
+                task.wait(2)
+            end
+        end)
+    end)
 
 
 
@@ -395,7 +413,7 @@ local RangerStageSection = Tabs.Main:AddSection("RangerStage")
         end)
 
 
---########################## GAMEPLAY ##########################
+--########################## GAMEPLAY ##########################        
 
     local AntiAfkToggle = MiscellaneousSection:AddToggle("TGAntiAfk", {Title = "AntiAFK", Default = false})
     local vim = game:GetService("VirtualInputManager")
@@ -405,25 +423,9 @@ local RangerStageSection = Tabs.Main:AddSection("RangerStage")
         antiAfkRunning = AntiAfk
         task.spawn(function()
             while antiAfkRunning do
-                local GetPlayerLocalLL = game:GetService("Players").LocalPlayer
-                local PlayerGuiLL = GetPlayerLocalLL:FindFirstChild("PlayerGui")
-    
-                if gui then
-                    local notifCh = PlayerGuiLL:FindFirstChild("Notification")
-                    local RewardGameCheck = PlayerGuiLL:FindFirstChild("RewardsUI")
-    
-                    -- ปิด Notification
-                    if notifCh then
-                        notifCh.Enabled = false
-                    end
-    
-                    if RewardGameCheck and RewardGameCheck.Enabled then
                         vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
                         vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
-                    end
-                end
-    
-                task.wait(5)
+                task.wait(0.2)
             end
         end)
     end)
@@ -632,6 +634,7 @@ local function gatherSettings()
 
         -- GAMEPLAY
         TGReady = AutoReadyToggle.Value,
+        TGAutoNext = AutoNextToggle.Value,
         TGAntiAfk = AntiAfkToggle.Value,
         AutoUpgradeYen = AutoUpgradeStatsYeld.Value,
         AutoUpgradeUnit = AutoUpgradeUnitAll.Value,
@@ -666,6 +669,7 @@ local function loadSettings()
 
         -- GAMEPLAY
         if data.TGReady ~= nil then AutoReadyToggle:SetValue(data.TGReady) end
+        if data.TGAutoNext ~= nil then AutoNextToggle:SetValue(data.TGAutoNext) end
         if data.TGAntiAfk ~= nil then AntiAfkToggle:SetValue(data.TGAntiAfk) end
         if data.AutoUpgradeYen ~= nil then AutoUpgradeStatsYeld:SetValue(data.AutoUpgradeYen) end
         if data.AutoUpgradeUnit ~= nil then AutoUpgradeUnitAll:SetValue(data.AutoUpgradeUnit) end
