@@ -1,4 +1,4 @@
-wait(10)
+wait(2)
 local GUI = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
@@ -502,7 +502,7 @@ local AutoUpgradeToggle = UpgradeSection:AddToggle("AutoUpgradeUnitSelect", {
 AutoUpgradeToggle:OnChanged(function(Value)
     UpgradeUnitSelect = Value
     task.spawn(function()
-        while UpgradeUnitSelect.Value do
+        while UpgradeUnitSelect do
             if unitFolder then
                 for _, unit in ipairs(unitFolder:GetChildren()) do
                     if table.find(SelectedUnits, unit.Name) then
