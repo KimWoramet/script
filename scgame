@@ -156,6 +156,7 @@ local AutoJoinEasterEvent = Event:AddToggle("TGEaster", {Title = "AutoEasterEven
 AutoJoinEasterEvent:OnChanged(function(AutoJoinEasterEventValue)
     task.spawn(function()
         while AutoJoinEasterEvent.Value do
+	wait(20)
             if game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value ~= "Event" then
                 if game:GetService("ReplicatedStorage").Values.Game.Level.Value == "" then
                     if game:GetService("ReplicatedStorage"):WaitForChild("Values"):WaitForChild("Game"):WaitForChild("GameRunning").Value == false then
