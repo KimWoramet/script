@@ -217,7 +217,7 @@ local ChallengeSection = Tabs.Main:AddSection("Challenge")
 
 local MiscellaneousSection = Tabs.Gameplay:AddSection("Miscellaneous")
 
-local AutoReadyToggle = MiscellaneousSection:AddToggle("TGReady", {Title = "AutoReady / Reaplay /AutoStartGame", Default = false })
+local AutoReadyToggle = MiscellaneousSection:AddToggle("TGReady", {Title = "AutoReady / Replay /AutoStartGame", Default = false })
     
     AutoReadyToggle:OnChanged(function(enabled)
         task.spawn(function()
