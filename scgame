@@ -9,8 +9,8 @@ game:GetService("Players").LocalPlayer.PlayerGui.Notification.Enabled = false
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local Window = GUI:CreateWindow({
-    Title = "KrukoiHub AnimeRangerX" .. GUI.Version,
+local KrukoiHubGUI = GUI:CreateWindow({
+    Title = "KrukoiHub AnimeRangerX",
     SubTitle = "by KimmyBabyBoy",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
@@ -19,17 +19,14 @@ local Window = GUI:CreateWindow({
     MinimizeKey = Enum.KeyCode.RightControl
 })
 
-
-
 local Tabs = {
-    Main = Window:AddTab({ Title = "Join Game", Icon = "" }),
-    Gameplay = Window:AddTab({ Title = "Gameplay", Icon = "" }),
-    FullyAuto = Window:AddTab({ Title = "AutoJoinGame(Fully Find Unit)", Icon = "" }),
-    Upgrade = Window:AddTab({ Title = "Upgrade(Lobby)", Icon = "" }),
-    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+    Main = KrukoiHubGUI:AddTab({ Title = "Join Game", Icon = "" }),
+    Gameplay = KrukoiHubGUI:AddTab({ Title = "Gameplay", Icon = "" }),
+    FullyAuto = KrukoiHubGUI:AddTab({ Title = "AutoJoinGame(Fully Find Unit)", Icon = "" }),
+    Upgrade = KrukoiHubGUI:AddTab({ Title = "Upgrade(Lobby)", Icon = "" }),
+    Webhook = KrukoiHubGUI:AddTab({ Title = "Webhook", Icon = "" }),
+    Settings = KrukoiHubGUI:AddTab({ Title = "Settings", Icon = "settings" })
 }
-
-
 
 
 --########################## AUTOJOIN ##########################
@@ -217,11 +214,12 @@ local ChallengeSection = Tabs.Main:AddSection("Challenge")
 
 local MiscellaneousSection = Tabs.Gameplay:AddSection("Miscellaneous")
 
-local AutoReadyToggle = MiscellaneousSection:AddToggle("TGReady", {Title = "AutoReady / Replay /AutoStartGame", Default = false })
+local AutoReadyToggle = MiscellaneousSection:AddToggle("TGReady", {Title = "AutoReady / Reaplay /AutoStartGame", Default = false })
     
     AutoReadyToggle:OnChanged(function(enabled)
         task.spawn(function()
             while AutoReadyToggle.Value do
+                wait(5)
                 if  game:GetService("ReplicatedStorage"):WaitForChild("Values"):WaitForChild("Game"):WaitForChild("GameRunning").Value == false then
                     if (game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value == "Ranger Stage") then
                         game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteNext"):FireServer()
@@ -246,6 +244,7 @@ local AutoReadyToggle = MiscellaneousSection:AddToggle("TGReady", {Title = "Auto
     AutoNextToggle:OnChanged(function(enabled)
         task.spawn(function()
             while AutoNextToggle.Value do
+                wait(5)
                 if  game:GetService("ReplicatedStorage"):WaitForChild("Values"):WaitForChild("Game"):WaitForChild("GameRunning").Value == false then
                     if (game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value == "Story") then
                         game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("OnGame"):WaitForChild("Voting"):WaitForChild("VoteNext"):FireServer()
@@ -379,7 +378,6 @@ local RangerStageSection = Tabs.Main:AddSection("RangerStage")
                             ["Mode"] = "Ranger Stage"
                         }
                     }
-                    
                     game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeModeToRangerStage))
                     task.wait(0.5)
                     local changeWorldRangerStage = {
@@ -388,7 +386,6 @@ local RangerStageSection = Tabs.Main:AddSection("RangerStage")
                             ["World"] = selectedWorldRangerStage
                         }
                     }
-                    
                     game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeWorldRangerStage))
                     task.wait(0.5)
                     local chapterName = selectedWorldRangerStage .. "_RangerStage" .. selectedRangerStage
@@ -458,66 +455,68 @@ local GetUnitUpgrade = game:GetService("ReplicatedStorage").Remote.Server.Units.
 local LCPLAYER = game:GetService("Players").LocalPlayer
 
 local function WaitForChildTimeout(parent, childName, timeout)
-	local timer = 0
-	while not parent:FindFirstChild(childName) and timer < timeout do
-		task.wait(0.1)
-		timer += 0.1
-	end
-	return parent:FindFirstChild(childName)
+    local timer = 0
+    while not parent:FindFirstChild(childName) and timer < timeout do
+        task.wait(0.1)
+        timer += 0.1
+    end
+    return parent:FindFirstChild(childName)
 end
 
 local unitFolder = WaitForChildTimeout(LCPLAYER, "UnitsFolder", 5)
 local UnitNames = {}
-
-if unitFolder then
-	for _, unit in ipairs(unitFolder:GetChildren()) do
-		table.insert(UnitNames, unit.Name)
-	end
-end
-
-
-local SelectAutoUpgradeUnit = UpgradeSection:AddDropdown("SelectAutoUpgradeUnit", {
-    Title = "Select Units to Upgrade",
-    Description = "",
-    Values = UnitNames,
-    Multi = true,
-    Default = {}
-})
-
 local SelectedUnits = {}
 
-SelectAutoUpgradeUnit:OnChanged(function(Value)
-    SelectedUnits = {}
-    for UnitName, isSelected in pairs(Value) do
-        if isSelected then
-            table.insert(SelectedUnits, UnitName)
-        end
+if unitFolder then
+    for _, unit in ipairs(unitFolder:GetChildren()) do
+        table.insert(UnitNames, unit.Name)
     end
-end)
 
-UpgradeUnitSelect = false
+    local SelectAutoUpgradeUnit = UpgradeSection:AddDropdown("SelectAutoUpgradeUnit", {
+        Title = "Select Units to Upgrade",
+        Description = "select unit for upgrade (this not save in auto save)",
+        Values = UnitNames,
+        Multi = true,
+        Default = {} 
+    })
+
+    SelectAutoUpgradeUnit:OnChanged(function(Value)
+        SelectedUnits = {}
+        for UnitName, isSelected in pairs(Value) do
+            if isSelected then
+                table.insert(SelectedUnits, UnitName)
+            end
+        end
+    end)
+else
+    warn("UnitsFolder not found!")
+end
+
+-- Toggle for auto upgrade selected units
 local UpgradeUnitSelect = false
-local AutoUpgradeToggle = UpgradeSection:AddToggle("AutoUpgradeUnitSelect", {
+local AutoUpgradeToggle = UpgradeSection:AddToggle("SelectAutoUpgradeUnitTG", {
     Title = "Auto Upgrade Selected Units",
     Default = false
 })
 
 AutoUpgradeToggle:OnChanged(function(Value)
     UpgradeUnitSelect = Value
-    task.spawn(function()
-        while UpgradeUnitSelect do
-            if unitFolder then
-                for _, unit in ipairs(unitFolder:GetChildren()) do
-                    if table.find(SelectedUnits, unit.Name) then
-                        GetUnitUpgrade:FireServer(unit)
-                        task.wait(0.2)
+    if UpgradeUnitSelect then
+        task.spawn(function()
+            while UpgradeUnitSelect.Value do
+                if unitFolder and #SelectedUnits > 0 then
+                    for _, unit in ipairs(unitFolder:GetChildren()) do
+                        if table.find(SelectedUnits, unit.Name) then
+                            GetUnitUpgrade:FireServer(unit)
+                        end
                     end
                 end
+                task.wait(1)
             end
-            task.wait(5)
-        end
-    end)
+        end)
+    end
 end)
+
 
 
 
@@ -597,10 +596,161 @@ end)
 
 
 
+local SelectChapter = {
+	[1] = "Create",
+	[2] = {["Chapter"] = "Namek_Chapter2"}}
+local changeModeToRangerStage = {
+                        [1] = "Change-Mode",
+                        [2] = {["Mode"] = "Ranger Stage"}}
+local ChangeWorldToAutoGogeta = {
+	[1] = "Change-World",
+	[2] = {["World"] = "Namek"}}
+local changeStageRangerForGetsGogeta1 = {
+                        [1] = "Change-RangerStage",
+                        [2] = {["Chapter"] = "Namek_RangerStage1"}}
+
+local changeStageRangerForGetsGogeta2 = {
+                        [1] = "Change-RangerStage",
+                        [2] = {["Chapter"] = "Namek_RangerStage2"}}
+
+local changeStageRangerForGetsGogeta3 = {
+                        [1] = "Change-RangerStage",
+                        [2] = {["Chapter"] = "Namek_RangerStage3"}}
+
+local SubmitCreateAutoGogeta = {[1] = "Submit"}
+local WkAutoStartFarmGogeta = {[1] = "Start"}
+
+--local GetGameMode = game:GetService("ReplicatedStorage"):WaitForChild("Values"):WaitForChild("Game")
+
+local AutoGetGogeta = AutoGetsUnitSecret:AddToggle("TGAutoGogeta", {Title = "AutoFindGogeta", Default = false })
+
+ValueAutoGetsGogeta = false
+AutoGetGogeta:OnChanged(function(ValueAutoGetsGogeta1)
+    ValueAutoGetsGogeta = ValueAutoGetsGogeta1
+    task.spawn(function()
+        while AutoGetGogeta.Value do 
+            if GetGameMode.Gamemode.Value ~= "Ranger Stage" then
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SelectChapter))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeModeToRangerStage))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(ChangeWorldToAutoGogeta))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeStageRangerForGetsGogeta1))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SubmitCreateAutoGogeta))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeStageRangerForGetsGogeta2))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SubmitCreateAutoGogeta))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeStageRangerForGetsGogeta3))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SubmitCreateAutoGogeta))
+                game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(WkAutoStartFarmGogeta))
+            end
+            task.wait(5)
+        end
+    end)
+end)
 
 
+local req = (syn and syn.request) or (http and http.request) or request
+local player = game.Players.LocalPlayer
+local playerName = player.Name
+local dataPath = game:GetService("ReplicatedStorage").Player_Data[playerName].Data
 
+local webhookurl = nil
 
+local Webhookss = Tabs.Webhook:AddSection("Webhook")
+
+local InputWebhook = Webhookss:AddInput("Inputwebhook", {
+    Title = "Webhook URL",
+    Placeholder = "Paste your webhook URL here",
+    Callback = function(Value)
+        webhookurl = Value
+    end
+})
+
+local function getAllRewards()
+    local rewards = player:FindFirstChild("RewardsShow")
+    if not rewards then return "No rewards." end
+
+    local list = {}
+    for _, item in ipairs(rewards:GetChildren()) do
+        local amountObj = item:FindFirstChild("Amount")
+        if amountObj and typeof(amountObj.Value) == "number" and amountObj.Value > 0 then
+            table.insert(list, string.format("%s: %s", item.Name, amountObj.Value))
+        end
+    end
+    return #list == 0 and "No rewards collected." or table.concat(list, "\n")
+end
+
+local AutoWebhook = Webhookss:AddToggle("TGSendWebhook", {
+    Title = "Auto Send Webhook",
+    Default = false
+})
+
+AutoWebhook:OnChanged(function(AutoWebhookSTATE)
+    if AutoWebhookSTATE then
+        task.spawn(function()
+            local lastState = true
+            while AutoWebhook.Value do
+                local gameRunning = game:GetService("ReplicatedStorage").Values.Game.GameRunning.Value
+                local GameVoteEnded = game:GetService("ReplicatedStorage"):WaitForChild("Values"):WaitForChild("Game"):WaitForChild("VotePlaying"):WaitForChild("VoteEnded")
+                    if webhookurl and gameRunning == false and GameVoteEnded.Value == true and lastState == true then
+                        local rewardsText = getAllRewards()
+                        local data = {
+                            ["username"] = "AnimeRangerX Logger",
+                            ["avatar_url"] = "https://i.imgur.com/OB0y6MR.png",
+                            ["embeds"] = {{
+                                ["title"] = "🧾 AnimeRangerX",
+                                ["color"] = tonumber("0x3498db"),
+                                ["fields"] = {
+                                    {
+                                        ["name"] = "👤 User",
+                                        ["value"] = "```" .. playerName .. "```",
+                                        ["inline"] = true
+                                    },
+                                    {
+                                        ["name"] = "📊 Totals",
+                                        ["value"] = "```Level: " .. dataPath.Level.Value .. "\nGold: " .. dataPath.Gold.Value .. "\nGems: " .. dataPath.Gem.Value .. "\nEgg: " .. dataPath.Egg.Value .. "```",
+                                        ["inline"] = true
+                                    },
+                                    {
+                                        ["name"] = "Gamemode",
+                                        ["value"] = "```" .. game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value .. "```",
+                                        ["inline"] = true
+                                    },
+                                    {
+                                        ["name"] = "Chapter",
+                                        ["value"] = "```" .. game:GetService("ReplicatedStorage").Values.Game.Level.Value .. "```",
+                                        ["inline"] = true
+                                    },
+                                    {
+                                        ["name"] = "💰 Rewards",
+                                        ["value"] = "```" .. rewardsText .. "```",
+                                        ["inline"] = true
+                                    },
+                                },
+                                ["footer"] = {
+                                    ["text"] = "KrukoiHub • AnimeRangerX"
+                                }
+                            }}
+                        }
+    
+                        req({
+                            Url = webhookurl,
+                            Method = "POST",
+                            Headers = {
+                                ["Content-Type"] = "application/json"
+                            },
+                            Body = HttpService:JSONEncode(data)
+                        })
+    
+                        lastState = false
+                end
+                if gameRunning == true then
+                    lastState = true
+                end
+
+                task.wait(1) 
+            end
+        end)
+    end
+end)
 
 SaveManager:SetLibrary(GUI)
 InterfaceManager:SetLibrary(GUI)
@@ -614,20 +764,12 @@ SaveManager:SetFolder("Krukoi")
 
 InterfaceManager:BuildInterfaceSection(Tabs.Settings)
 SaveManager:BuildConfigSection(Tabs.Settings)
-Window:SelectTab(1)
+KrukoiHubGUI:SelectTab(1)
 
 
 
 local function gatherSettings()
-    return {
-        -- MAIN
-        --[[SelectWorld = SelectWorld.Value,
-        SelectStageStory = SelectStageStory.Value,
-        DifficultyST = Difficulty.Value,
-        TGStartStory = StartStory.Value,
-        SelectWorldRangerStage = SelectWorldRangerStage.Value,
-        SelectRangerStage = SelectRangerStage.Value,
-        TGStartRangerStart = StartRangerStage.Value,]]
+    local settings = {
         TGChallenge = AutoChallenge.Value,
         TGEaster = AutoJoinEasterEvent.Value,
 
@@ -639,50 +781,65 @@ local function gatherSettings()
         AutoUpgradeYen = AutoUpgradeStatsYeld.Value,
         AutoUpgradeUnit = AutoUpgradeUnitAll.Value,
 
+        --upgradeunit
+        --SelectAutoUpgradeUnitTG = AutoUpgradeToggle.Value,
+
         --FullyAutoGetsUnit
         TGAutoMadara = AutoGetMadara.Value,
+        TGAutoGogeta = AutoGetGogeta.Value,
 
-
+        --webhook
+        webhookurl = webhookurl,
+        TGSendWebhook = AutoWebhook.Value,
     }
+    return settings
 end
 
---// ฟังก์ชัน Save Settings
 local function saveSettings()
     local settings = gatherSettings()
     writefile(SETTINGS_PATH, HttpService:JSONEncode(settings))
 end
 
---// ฟังก์ชัน Load Settings
 local function loadSettings()
     if not isfile(SETTINGS_PATH) then return end
 
-    local success, data = pcall(function()
-        return HttpService:JSONDecode(readfile(SETTINGS_PATH))
-    end)
-    if success and data then
-        -- MAIN
-        if data.TGChallenge ~= nil then AutoChallenge:SetValue(data.TGChallenge) end
-        if data.TGEaster ~= nil then AutoJoinEasterEvent:SetValue(data.TGEaster) end
+        local success, data = pcall(function()
+            return HttpService:JSONDecode(readfile(SETTINGS_PATH))
+        end)
+        if success and data then
+            -- MAIN
+            if data.TGChallenge ~= nil then AutoChallenge:SetValue(data.TGChallenge) end
+            if data.TGEaster ~= nil then AutoJoinEasterEvent:SetValue(data.TGEaster) end
 
 
 
 
-        -- GAMEPLAY
-        if data.TGReady ~= nil then AutoReadyToggle:SetValue(data.TGReady) end
-        if data.TGAutoNext ~= nil then AutoNextToggle:SetValue(data.TGAutoNext) end
-        if data.TGAntiAfk ~= nil then AntiAfkToggle:SetValue(data.TGAntiAfk) end
-        if data.AutoUpgradeYen ~= nil then AutoUpgradeStatsYeld:SetValue(data.AutoUpgradeYen) end
-        if data.AutoUpgradeUnit ~= nil then AutoUpgradeUnitAll:SetValue(data.AutoUpgradeUnit) end
-        if data.TGAutoMadara ~= nil then AutoGetMadara:SetValue(data.TGAutoMadara) end
+            -- GAMEPLAY
+            if data.TGReady ~= nil then AutoReadyToggle:SetValue(data.TGReady) end
+            if data.TGAutoNext ~= nil then AutoNextToggle:SetValue(data.TGAutoNext) end
+            if data.TGAntiAfk ~= nil then AntiAfkToggle:SetValue(data.TGAntiAfk) end
+            if data.AutoUpgradeYen ~= nil then AutoUpgradeStatsYeld:SetValue(data.AutoUpgradeYen) end
+            if data.AutoUpgradeUnit ~= nil then AutoUpgradeUnitAll:SetValue(data.AutoUpgradeUnit) end
+            if data.TGAutoMadara ~= nil then AutoGetMadara:SetValue(data.TGAutoMadara) end
+            if data.TGAutoGogeta ~= nil then AutoGetGogeta:SetValue(data.TGAutoGogeta) end
 
-        GUI:Notify({
-            Title = "Settings",
-            Content = "Settings Loaded Successfully!",
-            Duration = 5
-        })
+            --upgrade
+
+
+
+            --webhook
+            if data.webhookurl then webhookurl = data.webhookurl; InputWebhook:SetValue(webhookurl) end
+
+            if data.TGSendWebhook ~= nil then AutoWebhook:SetValue(data.TGSendWebhook) end
+
+            GUI:Notify({
+                Title = "Settings",
+                Content = "Settings Loaded Successfully!",
+                Duration = 5
+            })
+        end
     end
 end
-
 loadSettings()
 
 local SaveSetiing = Tabs.Settings:AddToggle("SaveSetiings", {
@@ -692,7 +849,7 @@ local SaveSetiing = Tabs.Settings:AddToggle("SaveSetiings", {
 
 SaveSetiing:OnChanged(function(enabled)
     task.spawn(function()
-        while enabled and SaveSetiing.Value do
+        while enabled and SaveSetiing do
             saveSettings()
             task.wait(5)
         end
@@ -706,7 +863,4 @@ Tabs.Settings:AddButton({
         loadSettings()
     end
 })
-
-
-
 SaveManager:LoadAutoloadConfig()
