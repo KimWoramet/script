@@ -839,7 +839,6 @@ local function loadSettings()
             })
         end
     end
-end
 loadSettings()
 
 local SaveSetiing = Tabs.Settings:AddToggle("SaveSetiings", {
