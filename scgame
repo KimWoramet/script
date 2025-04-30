@@ -503,7 +503,7 @@ AutoUpgradeToggle:OnChanged(function(upgunits)
     UpgradeUnitSelect = upgunits
     if UpgradeUnitSelect then
         task.spawn(function()
-            while UpgradeUnitSelect.Value do
+            while UpgradeUnitSelect do
                 if unitFolder and #SelectedUnits > 0 then
                     for _, unit in ipairs(unitFolder:GetChildren()) do
                         if table.find(SelectedUnits, unit.Name) then
