@@ -503,7 +503,7 @@ AutoUpgradeToggle:OnChanged(function(Value)
     UpgradeUnitSelect = Value
     if UpgradeUnitSelect then
         task.spawn(function()
-            while UpgradeUnitSelect.Value do
+            while UpgradeUnitSelect do
                 if unitFolder and #SelectedUnits > 0 then
                     for _, unit in ipairs(unitFolder:GetChildren()) do
                         if table.find(SelectedUnits, unit.Name) then
@@ -528,7 +528,7 @@ local AutoUpgradeUnitAll = UpgradeSection:AddToggle("AutoUpgradeUnit", {Title = 
 AutoUpgradeUnitAll:OnChanged(function(UpgradeUnits)
         UpgradeUnit = UpgradeUnits
             task.spawn(function()
-                while AutoUpgradeUnitAll.Value do
+                while AutoUpgradeUnitAll do
                     for _, unit in ipairs(unitFolder:GetChildren()) do
                         GetUnitUpgrade:FireServer(unit)
                         task.wait(0.2)
@@ -576,7 +576,7 @@ ValueAutoGetsMadara = false
 AutoGetMadara:OnChanged(function(ValueAutoGetsMadara1)
     ValueAutoGetsMadara = ValueAutoGetsMadara1
     task.spawn(function()
-        while AutoGetMadara.Value do 
+        while AutoGetMadara do 
             if GetGameMode.Gamemode.Value ~= "Ranger Stage" then
                 game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SelectChapter))
                 game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeModeToRangerStage))
@@ -628,7 +628,7 @@ ValueAutoGetsGogeta = false
 AutoGetGogeta:OnChanged(function(ValueAutoGetsGogeta1)
     ValueAutoGetsGogeta = ValueAutoGetsGogeta1
     task.spawn(function()
-        while AutoGetGogeta.Value do 
+        while AutoGetGogeta do 
             if GetGameMode.Gamemode.Value ~= "Ranger Stage" then
                 game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SelectChapter))
                 game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeModeToRangerStage))
