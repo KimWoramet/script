@@ -499,11 +499,11 @@ local AutoUpgradeToggle = UpgradeSection:AddToggle("SelectAutoUpgradeUnitTG", {
     Default = false
 })
 
-AutoUpgradeToggle:OnChanged(function(Value)
-    UpgradeUnitSelect = Value
+AutoUpgradeToggle:OnChanged(function(upgunits)
+    UpgradeUnitSelect = upgunits
     if UpgradeUnitSelect then
         task.spawn(function()
-            while UpgradeUnitSelect do
+            while UpgradeUnitSelect.Value do
                 if unitFolder and #SelectedUnits > 0 then
                     for _, unit in ipairs(unitFolder:GetChildren()) do
                         if table.find(SelectedUnits, unit.Name) then
@@ -528,7 +528,7 @@ local AutoUpgradeUnitAll = UpgradeSection:AddToggle("AutoUpgradeUnit", {Title = 
 AutoUpgradeUnitAll:OnChanged(function(UpgradeUnits)
         UpgradeUnit = UpgradeUnits
             task.spawn(function()
-                while AutoUpgradeUnitAll do
+                while AutoUpgradeUnitAll.Value do
                     for _, unit in ipairs(unitFolder:GetChildren()) do
                         GetUnitUpgrade:FireServer(unit)
                         task.wait(0.2)
@@ -576,7 +576,7 @@ ValueAutoGetsMadara = false
 AutoGetMadara:OnChanged(function(ValueAutoGetsMadara1)
     ValueAutoGetsMadara = ValueAutoGetsMadara1
     task.spawn(function()
-        while AutoGetMadara do 
+        while AutoGetMadara.Value do 
             if GetGameMode.Gamemode.Value ~= "Ranger Stage" then
                 game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SelectChapter))
                 game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeModeToRangerStage))
@@ -628,7 +628,7 @@ ValueAutoGetsGogeta = false
 AutoGetGogeta:OnChanged(function(ValueAutoGetsGogeta1)
     ValueAutoGetsGogeta = ValueAutoGetsGogeta1
     task.spawn(function()
-        while AutoGetGogeta do 
+        while AutoGetGogeta.Value do 
             if GetGameMode.Gamemode.Value ~= "Ranger Stage" then
                 game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(SelectChapter))
                 game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(changeModeToRangerStage))
