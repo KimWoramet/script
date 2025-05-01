@@ -32,7 +32,7 @@ local StartChallenge = {
 
 
 --fix longlag
-if game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value == "Event" then
+--[[if game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value == "Event" then
     task.delay(3600, function()
         game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(EasterEventJoin))
                         game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(StartEvent)) 
@@ -43,7 +43,7 @@ elseif game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value == "Chall
         game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(SubmitCreate))
         game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(StartChallenge))
     end)
-end
+end]]
 
 
 
