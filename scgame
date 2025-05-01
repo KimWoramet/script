@@ -529,6 +529,40 @@ AutoUpgradeToggle:OnChanged(function(upgunits)
 end)
 
 
+local unitnameupgrade = nil
+
+local InputName = UpgradeSection:AddInput("InputName", {
+    Title = "NameUnitYouCanget on dropdown",
+    Placeholder = "Paste your Nameunit for upgrade",
+    Callback = function(nameunit)
+        unitnameupgrade = nameunit
+    end
+})
+
+local UpgradeUnitSelect2 = false
+local AutoUpgradeToggle2 = UpgradeSection:AddToggle("SelectAutoUpgradeUnitTG2", {
+    Title = "Auto Upgrade Unit by Name",
+    Default = false
+})
+
+AutoUpgradeToggle2:OnChanged(function(upgunits2)
+    UpgradeUnitSelect2 = upgunits2
+    if UpgradeUnitSelect2 then
+        task.spawn(function()
+            while UpgradeUnitSelect2 do
+                if unitFolder and unitnameupgrade then
+                    for _, unit in ipairs(unitFolder:GetChildren()) do
+                        if unit.Name == unitnameupgrade then
+                            GetUnitUpgrade:FireServer(unit)
+                        end
+                    end
+                end
+                task.wait(1)
+            end
+        end)
+    end
+end)
+
 
 
 
@@ -794,6 +828,8 @@ local function gatherSettings()
         AutoUpgradeUnit = AutoUpgradeUnitAll.Value,
 
         --upgradeunit
+        InputName = InputName,
+        SelectAutoUpgradeUnitTG2 = AutoUpgradeToggle2.Value,
         --SelectAutoUpgradeUnitTG = AutoUpgradeToggle.Value,
 
         --FullyAutoGetsUnit
@@ -836,8 +872,8 @@ local function loadSettings()
             if data.TGAutoGogeta ~= nil then AutoGetGogeta:SetValue(data.TGAutoGogeta) end
 
             --upgrade
-
-
+            if data.InputName then InputName = data.InputName; InputWebhook:SetValue(InputName) end
+            if data.SelectAutoUpgradeUnitTG2 ~= nil then AutoUpgradeToggle2:SetValue(data.SelectAutoUpgradeUnitTG2) end
 
             --webhook
             if data.webhookurl then webhookurl = data.webhookurl; InputWebhook:SetValue(webhookurl) end
