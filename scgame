@@ -230,6 +230,7 @@ local AutoReadyToggle = MiscellaneousSection:AddToggle("TGReady", {Title = "Auto
                     end
                 end
                 if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("RewardsUI") and game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled == true then
+                    wait(20)
                     game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled = false
                 end
                 task.wait(2)
@@ -252,6 +253,7 @@ local AutoReadyToggle = MiscellaneousSection:AddToggle("TGReady", {Title = "Auto
                     end
                 end
                 if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("RewardsUI") and game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled == true then
+                    wait(20)
                     game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled = false
                 end
                 task.wait(2)
@@ -422,7 +424,16 @@ local RangerStageSection = Tabs.Main:AddSection("RangerStage")
             while antiAfkRunning do
                         vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
                         vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
-                task.wait(0.2)
+                        task.wait(1)
+                        vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                        vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                        task.wait(1)
+                        vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                        vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                        task.wait(1)
+                        vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                        vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                task.wait(1)
             end
         end)
     end)
@@ -741,6 +752,7 @@ AutoWebhook:OnChanged(function(AutoWebhookSTATE)
                         })
     
                         lastState = false
+                        game:GetService("Players").LocalPlayer.PlayerGui.RewardsUI.Enabled = false
                 end
                 if gameRunning == true then
                     lastState = true
