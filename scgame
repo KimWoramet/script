@@ -7,6 +7,47 @@ local SETTINGS_PATH = "Krukoi/KrukoiHub_AnimeRangerX_settings.json"
 
 game:GetService("Players").LocalPlayer.PlayerGui.Notification.Enabled = false
 
+local EasterEventJoin = {
+    [1] = "Easter-Event"
+}
+
+local StartEvent = {
+    [1] = "Start"
+}
+
+local CreateChallengeRoom = {
+    [1] = "Create",
+    [2] = {
+        ["CreateChallengeRoom"] = true
+    }
+}
+
+local SubmitCreate = {
+    [1] = "Submit"
+}
+
+local StartChallenge = {
+    [1] = "Start"
+}
+
+
+--fix longlag
+if game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value == "Event" then
+    task.delay(3600, function()
+        game:GetService("ReplicatedStorage").Remote.Server.PlayRoom.Event:FireServer(unpack(EasterEventJoin))
+                        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(StartEvent)) 
+    end)
+elseif game:GetService("ReplicatedStorage").Values.Game.Gamemode.Value == "Challenge" then
+    task.delay(3600, function()
+        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(CreateChallengeRoom))
+        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(SubmitCreate))
+        game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Server"):WaitForChild("PlayRoom"):WaitForChild("Event"):FireServer(unpack(StartChallenge))
+    end)
+end
+
+
+
+
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local KrukoiHubGUI = GUI:CreateWindow({
@@ -139,15 +180,6 @@ end)
 
 local Event = Tabs.Main:AddSection("Event")
 
-
-local EasterEventJoin = {
-    [1] = "Easter-Event"
-}
-
-local StartEvent = {
-    [1] = "Start"
-}
-
 local AutoJoinEasterEvent = Event:AddToggle("TGEaster", {Title = "AutoEasterEvent", Default = false })
 
 AutoJoinEasterEvent:OnChanged(function(AutoJoinEasterEventValue)
@@ -172,21 +204,6 @@ end)
 
 local ChallengeSection = Tabs.Main:AddSection("Challenge")
 
-
-    local CreateChallengeRoom = {
-        [1] = "Create",
-        [2] = {
-            ["CreateChallengeRoom"] = true
-        }
-    }
-
-    local SubmitCreate = {
-        [1] = "Submit"
-    }
-
-    local StartChallenge = {
-        [1] = "Start"
-    }
     
     local AutoChallenge = ChallengeSection:AddToggle("TGChallenge", {Title = "AutoJoinChallenge", Default = false })
 
@@ -531,7 +548,7 @@ end)
 
 local unitnameupgrade = nil
 
-local InputName = UpgradeSection:AddInput("InputName", {
+local InputNameUN = UpgradeSection:AddInput("InputNameUN", {
     Title = "NameUnitYouCanget on dropdown",
     Placeholder = "Paste your Nameunit for upgrade",
     Callback = function(nameunit)
@@ -828,7 +845,7 @@ local function gatherSettings()
         AutoUpgradeUnit = AutoUpgradeUnitAll.Value,
 
         --upgradeunit
-        InputName = InputName,
+        unitnameupgrade = unitnameupgrade,
         SelectAutoUpgradeUnitTG2 = AutoUpgradeToggle2.Value,
         --SelectAutoUpgradeUnitTG = AutoUpgradeToggle.Value,
 
@@ -872,7 +889,7 @@ local function loadSettings()
             if data.TGAutoGogeta ~= nil then AutoGetGogeta:SetValue(data.TGAutoGogeta) end
 
             --upgrade
-            if data.InputName then InputName = data.InputName; InputWebhook:SetValue(InputName) end
+            if data.unitnameupgrade then unitnameupgrade = data.unitnameupgrade; InputNameUN:SetValue(unitnameupgrade) end
             if data.SelectAutoUpgradeUnitTG2 ~= nil then AutoUpgradeToggle2:SetValue(data.SelectAutoUpgradeUnitTG2) end
 
             --webhook
